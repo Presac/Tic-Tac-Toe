@@ -102,45 +102,67 @@ class Player():
         self.sign = sign
 
 
+class AI(Player):
+    pass
+
+
 def game():
+    board = Board()
+    print('Welcome to a game of Tic-Tac-Toe')
     while True:
-        board = Board()
+        print('What do you want to do?\n'
+              '1: Play against another player.\n'
+              '2: Play against the computer.\n'
+              '3: Exit')
+        val = input('Pick a number: ')
+        if val == '1':
+            player1 = Player('Player 1', 0)
+            player2 = Player('Player 2', 1)
+
+            players = [player1, player2]
+        elif val == '2':
+            player1 = Player('Player 1', 0)
+            player2 = AI('AI', 1)
+
+            players = [player1, player2]
+        elif val == '3':
+            print('Hope to see you again :)')
+            break
+        else:
+            print('Not an option.')
+
+        while True:
+            runGame(board)
+            break
+
+
+def runGame(board, players):
+    board.printBoard()
+
+    currentP = toggleValue()
+
+    # Main game run
+    while True:
+        player = next(currentP)
+        print(f'{players[player].name} is having their turn.')
+        # Request the player to input which field to use
+        while True:
+            x, y = getInput(board.withinBoard)
+
+            # Check if field is already free
+            if board.fieldFree(x, y):
+                board.writeField(x, y, players[player].sign)
+                break
+            else:
+                print('The field is already taken.'
+                      'Please choose a new one.')
+
         board.printBoard()
 
-        player1 = Player('Player 1', 0)
-        player2 = Player('Player 2', 1)
-
-        players = [player1, player2]
-        currentP = toggleValue()
-
-        # Main game run
-        while True:
-            player = next(currentP)
-            print(f'{players[player].name} is having their turn.')
-            # Request the player to input which field to use
-            while True:
-                x, y = getInput(board.withinBoard)
-
-                # Check if field is already free
-                if board.fieldFree(x, y):
-                    board.writeField(x, y, players[player].sign)
-                    break
-                else:
-                    print('The field is already taken.'
-                          'Please choose a new one.')
-
-            board.printBoard()
-
-            # Check if the player has won
-            if board.isWin(x, y, players[player].sign):
-                print(f'{players[player].name} has won the game.')
-                # Stop current game
-                break
-
-        print('Do you want to play again (Y/N)? ')
-        val = input('(Default Y): ')
-        if val.lower() == 'n':
-            print('Thanks for playing :)')
+        # Check if the player has won
+        if board.isWin(x, y, players[player].sign):
+            print(f'{players[player].name} has won the game.')
+            # Stop current game
             break
 
 
