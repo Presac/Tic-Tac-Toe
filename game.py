@@ -48,16 +48,24 @@ def game():
 
     print('Player')
 
-    print('Choose row')
-    y = getInput(board.withinY)
+    # Main game run
+    while True:
 
-    print('Choose coloumn')
-    x = getInput(board.withinX)
+        # Request the player to input which field to use
+        while True:
+            print('Choose row')
+            y = getInput(board.withinY)
+            print('Choose coloumn')
+            x = getInput(board.withinX)
 
-    if board.fieldFree(x, y, 'X'):
-        board.writeField(x, y, 'X')
+            # Check if field is already free
+            if board.fieldFree(x, y, 'X'):
+                board.writeField(x, y, 'X')
+                break
+            else:
+                print('The field is already taken. Please choose a new one.')
 
-    board.printBoard()
+        board.printBoard()
 
 
 # Returns a value from an input within the requirements of a function func
