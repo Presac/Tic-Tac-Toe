@@ -44,47 +44,38 @@ class Board:
     def isWin(self, x, y, sign):
 
         # Functions to check for sign in each form of line
+
         # Checking in a horizontal line
         def horizontal(y, sign):
-            for i in range(3):
-                # Checks if the field is anything but the current sign
-                if not self.fields[y][i] == sign:
-                    # Stop loop as soon as a wrong sign is detected
-                    break
-            else:
-                # Every sign in the line is the right one
+            # Check if all values are equal the played sign
+            if all(f == sign for f in self.fields[y]):
                 return True
-            return False
+            else:
+                return False
 
         # Checking in a vertical line.
-        # Basically the same as horizontal.
         def vertical(x, sign):
-            for i in range(3):
-                if not self.fields[i][x] == sign:
-                    break
-            else:
+            # Check if all values are equal the played sign
+            if all(f == sign for f in [self.fields[i][x] for i in range(3)]):
                 return True
-            return False
+            else:
+                return False
 
         # Checking in a downward diagonal line.
-        # Basically the same as horizontal.
         def downDiagonal(sign):
-            for i in range(3):
-                if not self.fields[i][i] == sign:
-                    break
-            else:
+            # Check if all values are equal the played sign
+            if all(f == sign for f in [self.fields[i][i] for i in range(3)]):
                 return True
-            return False
+            else:
+                return False
 
         # Checking in a upward diagonal line.
-        # Basically the same as horizontal.
         def upDiagonal(sign):
-            for i in range(3):
-                if not self.fields[2 - i][i] == sign:
-                    break
-            else:
+            # Check if all values are equal the played sign
+            if all(f == sign for f in [self.fields[2-i][i] for i in range(3)]):
                 return True
-            return False
+            else:
+                return False
 
         # corner
         if (y == 0 or y == 2) and (x == 0 or x == 2):
