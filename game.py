@@ -28,44 +28,124 @@ class Board:
     # Check whether y is within the allowable range
     def withinY(self, y):
         if y.isdigit():
-            return 0 <= int(y) < len(self.fields)
+            return 0 <= int(y) - 1 < len(self.fields)
         return False
 
     # Check whether x is within the allowable range
     def withinX(self, x):
         if x.isdigit():
-            return 0 <= int(x) < len(self.fields[0])
+            return 0 <= int(x) - 1 < len(self.fields[0])
         return False
 
     # Check whether the location of the input is already taken
-    def fieldFree(self, x, y, input):
+    def fieldFree(self, x, y):
         return self.fields[y][x] is False
+
+    def isWin(self, x, y, sign):
+
+        # Functions to check for sign in each form of line
+        # Checking in a horizontal line
+        def horizontal(y, sign):
+            for i in range(3):
+                # Checks if the field is anything but the current sign
+                if not self.fields[y][i] == sign:
+                    # Stop loop as soon as a wrong sign is detected
+                    break
+            else:
+                # Every sign in the line is the right one
+                return True
+            return False
+
+        # Checking in a vertical line.
+        # Basically the same as horizontal.
+        def vertical(x, sign):
+            for i in range(3):
+                if not self.fields[i][x] == sign:
+                    break
+            else:
+                return True
+            return False
+
+        # Checking in a downward diagonal line.
+        # Basically the same as horizontal.
+        def downDiagonal(sign):
+            for i in range(3):
+                if not self.fields[i][i] == sign:
+                    break
+            else:
+                return True
+            return False
+
+        # Checking in a upward diagonal line.
+        # Basically the same as horizontal.
+        def upDiagonal(sign):
+            for i in range(3):
+                if not self.fields[2 - i][i] == sign:
+                    break
+            else:
+                return True
+            return False
+
+        # corner
+        if (y == 0 or y == 2) and (x == 0 or x == 2):
+            if x == y:
+                temp = downDiagonal(sign)
+            else:
+                temp = upDiagonal(sign)
+            return vertical(x, sign) or horizontal(y, sign) or temp
+
+        # center
+        if y == 1 and x == 1:
+            return vertical(x, sign) or horizontal(y, sign) or \
+                downDiagonal(sign) or upDiagonal(sign)
+
+        # edge
+        if (y == 1 and (x == 0 or x == 2)) or (x == 1 and (y == 0 or y == 2)):
+            return vertical(x, sign) or horizontal(y, sign)
+
+
+# Player class for saving name and which sign to use
+class Player():
+    def __init__(self, name, sign):
+        self.name = name
+        self.sign = sign
 
 
 def game():
     board = Board()
     board.printBoard()
 
-    print('Player')
+    player1 = Player('Player 1', 'X')
+    player2 = Player('Player 2', 'O')
+
+    players = [player1, player2]
+    currentP = currentPlayer()
 
     # Main game run
     while True:
-
+        player = next(currentP)
+        print(f'{players[player].name} is having their turn.')
         # Request the player to input which field to use
         while True:
-            print('Choose row')
+            print('Choose row: ', end='')
             y = getInput(board.withinY)
-            print('Choose coloumn')
+            print('Choose coloumn: ', end='')
             x = getInput(board.withinX)
 
             # Check if field is already free
-            if board.fieldFree(x, y, 'X'):
-                board.writeField(x, y, 'X')
+            if board.fieldFree(x, y):
+                board.writeField(x, y, players[player].sign)
                 break
             else:
                 print('The field is already taken. Please choose a new one.')
 
         board.printBoard()
+
+        # Check if the player has won
+        if board.isWin(x, y, players[player].sign):
+            print(f'{players[player].name} has won the game.')
+            # Stop current game
+            break
 
 
 # Returns a value from an input within the requirements of a function func
@@ -75,7 +155,14 @@ def getInput(func):
         while not func(val):
             print('Please choose a number within the range of the board')
             val = input()
-    return int(val)
+    return int(val) - 1
+
+
+# Iterator for going between 0 and 1
+def currentPlayer():
+    while True:
+        yield 0
+        yield 1
 
 
 if __name__ == "__main__":
