@@ -100,39 +100,48 @@ class Player():
 
 
 def game():
-    board = Board()
-    board.printBoard()
-
-    player1 = Player('Player 1', 'X')
-    player2 = Player('Player 2', 'O')
-
-    players = [player1, player2]
-    currentP = toggleValue()
-
-    # Main game run
+    
     while True:
-        player = next(currentP)
-        print(f'{players[player].name} is having their turn.')
-        # Request the player to input which field to use
-        while True:
-            print('Choose row: ', end='')
-            y = getInput(board.withinY)
-            print('Choose coloumn: ', end='')
-            x = getInput(board.withinX)
-
-            # Check if field is already free
-            if board.fieldFree(x, y):
-                board.writeField(x, y, players[player].sign)
-                break
-            else:
-                print('The field is already taken. Please choose a new one.')
-
+        board = Board()
         board.printBoard()
 
-        # Check if the player has won
-        if board.isWin(x, y, players[player].sign):
-            print(f'{players[player].name} has won the game.')
-            # Stop current game
+        player1 = Player('Player 1', 'X')
+        player2 = Player('Player 2', 'O')
+
+        players = [player1, player2]
+        currentP = toggleValue()
+
+        # Main game run
+        while True:
+            player = next(currentP)
+            print(f'{players[player].name} is having their turn.')
+            # Request the player to input which field to use
+            while True:
+                print('Choose row: ', end='')
+                y = getInput(board.withinY)
+                print('Choose coloumn: ', end='')
+                x = getInput(board.withinX)
+
+                # Check if field is already free
+                if board.fieldFree(x, y):
+                    board.writeField(x, y, players[player].sign)
+                    break
+                else:
+                    print('The field is already taken.'
+                          'Please choose a new one.')
+
+            board.printBoard()
+
+            # Check if the player has won
+            if board.isWin(x, y, players[player].sign):
+                print(f'{players[player].name} has won the game.')
+                # Stop current game
+                break
+
+        print('Do you want to play again (Y/N)? ')
+        val = input('(Default Y): ')
+        if val.lower() == 'n':
+            print('Thanks for playing :)')
             break
 
 
