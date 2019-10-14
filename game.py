@@ -41,6 +41,7 @@ class Board:
     def fieldFree(self, x, y):
         return self.fields[y][x] is False
 
+    # Check whether the current field is a win
     def isWin(self, x, y, sign):
 
         # Functions to check for sign in each form of line
@@ -50,34 +51,30 @@ class Board:
             # Check if all values are equal the played sign
             if all(f == sign for f in self.fields[y]):
                 return True
-            else:
-                return False
+            return False
 
         # Checking in a vertical line.
         def vertical(x, sign):
             # Check if all values are equal the played sign
             if all(f == sign for f in [self.fields[i][x] for i in range(3)]):
                 return True
-            else:
-                return False
+            return False
 
         # Checking in a downward diagonal line.
         def downDiagonal(sign):
             # Check if all values are equal the played sign
             if all(f == sign for f in [self.fields[i][i] for i in range(3)]):
                 return True
-            else:
-                return False
+            return False
 
         # Checking in a upward diagonal line.
         def upDiagonal(sign):
             # Check if all values are equal the played sign
             if all(f == sign for f in [self.fields[2-i][i] for i in range(3)]):
                 return True
-            else:
-                return False
+            return False
 
-        # corner
+        # Check if input field is in a corner
         if (y == 0 or y == 2) and (x == 0 or x == 2):
             if x == y:
                 temp = downDiagonal(sign)
@@ -85,12 +82,12 @@ class Board:
                 temp = upDiagonal(sign)
             return vertical(x, sign) or horizontal(y, sign) or temp
 
-        # center
+        # Check if input field is in the center
         if y == 1 and x == 1:
             return vertical(x, sign) or horizontal(y, sign) or \
                 downDiagonal(sign) or upDiagonal(sign)
 
-        # edge
+        # Check if input field is at the edge
         if (y == 1 and (x == 0 or x == 2)) or (x == 1 and (y == 0 or y == 2)):
             return vertical(x, sign) or horizontal(y, sign)
 
@@ -110,7 +107,7 @@ def game():
     player2 = Player('Player 2', 'O')
 
     players = [player1, player2]
-    currentP = currentPlayer()
+    currentP = toggleValue()
 
     # Main game run
     while True:
@@ -150,7 +147,7 @@ def getInput(func):
 
 
 # Iterator for going between 0 and 1
-def currentPlayer():
+def toggleValue():
     while True:
         yield 0
         yield 1
