@@ -1,23 +1,25 @@
 
 class Board:
-    # Represents 9 fields
-    fields = [[False for x in range(3)] for y in range(3)]
-
     # Either 1 or 2
-    player = False
+    signs = ('X', 'O')
 
     def __init__(self):
-        pass
+        # Represents 9 fields
+        self.fields = [[-1 for x in range(3)] for y in range(3)]
+
+    # Reset the board to the inital state
+    def resetBoard(self):
+        self.fields = [[-1 for x in range(3)] for y in range(3)]
 
     # Prints the table with 3 fields in each line
     def printBoard(self):
         fieldStr = ''
         for y in range(len(self.fields)):
             for x in range(len(self.fields[y])):
-                if not self.fields[y][x]:
+                if self.fields[y][x] is -1:
                     fieldStr += '[   ]'
                 else:
-                    fieldStr += f'[ {self.fields[y][x]} ]'
+                    fieldStr += f'[ {self.signs[self.fields[y][x]]} ]'
             fieldStr += '\n'
         print(fieldStr)
 
@@ -27,19 +29,20 @@ class Board:
 
     # Check whether y is within the allowable range
     def withinY(self, y):
-        if y.isdigit():
-            return 0 <= int(y) - 1 < len(self.fields)
-        return False
+        return 0 <= int(y) - 1 < len(self.fields)
 
     # Check whether x is within the allowable range
     def withinX(self, x):
-        if x.isdigit():
-            return 0 <= int(x) - 1 < len(self.fields[0])
-        return False
+        return 0 <= int(x) - 1 < len(self.fields[0])
+
+    # Check whether x is within the allowable range
+    def withinBoard(self, x, y):
+        return (0 <= int(x) - 1 < len(self.fields[0])) and \
+            (0 <= int(y) - 1 < len(self.fields))
 
     # Check whether the location of the input is already taken
     def fieldFree(self, x, y):
-        return self.fields[y][x] is False
+        return self.fields[y][x] is -1
 
     # Check whether the current field is a win
     def isWin(self, x, y, sign):
@@ -100,13 +103,12 @@ class Player():
 
 
 def game():
-    
     while True:
         board = Board()
         board.printBoard()
 
-        player1 = Player('Player 1', 'X')
-        player2 = Player('Player 2', 'O')
+        player1 = Player('Player 1', 0)
+        player2 = Player('Player 2', 1)
 
         players = [player1, player2]
         currentP = toggleValue()
@@ -117,10 +119,7 @@ def game():
             print(f'{players[player].name} is having their turn.')
             # Request the player to input which field to use
             while True:
-                print('Choose row: ', end='')
-                y = getInput(board.withinY)
-                print('Choose coloumn: ', end='')
-                x = getInput(board.withinX)
+                x, y = getInput(board.withinBoard)
 
                 # Check if field is already free
                 if board.fieldFree(x, y):
@@ -145,14 +144,30 @@ def game():
             break
 
 
-# Returns a value from an input within the requirements of a function func
+# Asks for and returns a value from an input within the requirements of a
+# function func
 def getInput(func):
-    val = input()
-    if not func(val):
-        while not func(val):
-            print('Please choose a number within the range of the board')
-            val = input()
-    return int(val) - 1
+    while True:
+        print('Choose row and coloumn (col row): ', end='')
+        # Try for input, in case the user doesn't input two values
+        try:
+            x, y = input().split(' ')
+        except ValueError:
+            print('Input is not 2 values.')
+            continue
+
+        # Check if any of the two values is not an int
+        if not (x.isdigit() and y.isdigit()):
+            print('Input is not a number. Letters won\'t work.')
+            continue
+
+        # Check if the values confine within the restrictions of a func
+        if func(x, y):
+            break
+
+        print('The choice is not within the range of the board.')
+
+    return int(x) - 1, int(y) - 1
 
 
 # Iterator for going between 0 and 1
