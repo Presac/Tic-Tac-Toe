@@ -62,30 +62,25 @@ class Board:
         # Checking in a horizontal line
         def horizontal(y, sign):
             # Check if all values are equal the played sign
-            if all(f == sign for f in self.fields[y]):
-                return True
-            return False
+            return all(f == sign for f in self.fields[y])
 
         # Checking in a vertical line.
         def vertical(x, sign):
             # Check if all values are equal the played sign
-            if all(f == sign for f in [self.fields[i][x] for i in range(3)]):
-                return True
-            return False
+            return all(f == sign for f in
+                       [self.fields[i][x] for i in range(3)])
 
         # Checking in a downward diagonal line.
         def downDiagonal(sign):
             # Check if all values are equal the played sign
-            if all(f == sign for f in [self.fields[i][i] for i in range(3)]):
-                return True
-            return False
+            return all(f == sign for f in
+                       [self.fields[i][i] for i in range(3)])
 
         # Checking in a upward diagonal line.
         def upDiagonal(sign):
             # Check if all values are equal the played sign
-            if all(f == sign for f in [self.fields[2-i][i] for i in range(3)]):
-                return True
-            return False
+            return all(f == sign for f in
+                       [self.fields[2-i][i] for i in range(3)])
 
         # Check if input field is in a corner
         if (y == 0 or y == 2) and (x == 0 or x == 2):
@@ -174,6 +169,7 @@ def game():
             break
         else:
             print('Not an option.')
+            continue
 
         while True:
             board.resetBoard()
