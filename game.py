@@ -26,7 +26,7 @@ class Player():
                 continue
 
             # Check if the values confine to the board
-            if board.isWithinBoard(x, y):
+            if board.isWithinBoard(int(x) - 1, int(y) - 1):
                 break
 
             print('The choice is not within the range of the board.')

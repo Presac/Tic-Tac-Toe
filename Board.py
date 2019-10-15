@@ -59,18 +59,10 @@ class Board:
     def writeField(self, x, y, input):
         self.fields[y][x] = input
 
-    # Check whether y is within the allowable range
-    def isWithinY(self, y):
-        return 0 <= int(y) - 1 < len(self.fields)
-
-    # Check whether x is within the allowable range
-    def isWithinX(self, x):
-        return 0 <= int(x) - 1 < len(self.fields[0])
-
     # Check whether x is within the allowable range
     def isWithinBoard(self, x, y):
-        return (0 <= int(x) - 1 < len(self.fields[0])) and \
-            (0 <= int(y) - 1 < len(self.fields))
+        return (0 <= x - 1 < len(self.fields[0])) and \
+            (0 <= y - 1 < len(self.fields))
 
     # Check whether the location of the input is already taken
     def isFieldFree(self, x, y):
