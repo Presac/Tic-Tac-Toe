@@ -189,50 +189,53 @@ class AI(Player):
         loseFields = []
 
         # Check if the ai can put its third sign in a line
-        for i in range(3):
+        for n in range(3):
             # Get the row/column and save it as set to remove dupes
-            rowTup = set(board.row(i))
-            colTup = set(board.column(i))
+            row = board.row(n)
+            rowSet = set(row)
+            col = board.column(n)
+            colSet = set(col)
 
             # Check if the ai's sign is twice in the row/column
-            # and one free field is available
+            # and one free field is available = Win
             # For row
-            if len(rowTup) == 2 and self.sign in rowTup and -1 in rowTup \
-                    and board.row(i).count(self.sign) == 2:
-                winFields.append([board.row(i).index(-1), i])
+            if len(rowSet) == 2 and self.sign in rowSet and -1 in rowSet \
+                    and row.count(self.sign) == 2:
+                winFields.append([row.index(-1), n])
             # For column
-            if len(colTup) == 2 and self.sign in colTup and -1 in colTup \
-                    and board.column(i).count(self.sign) == 2:
-                winFields.append([i, board.column(i).index(-1)])
+            if len(colSet) == 2 and self.sign in colSet and -1 in colSet \
+                    and col.count(self.sign) == 2:
+                winFields.append([n, col.index(-1)])
 
             # Check if the opponents sign is twice in the row/column
-            # and one free field is available
+            # and one free field is available = Loss
             # For row
-            if len(rowTup) == 2 and self.sign not in rowTup and -1 in rowTup \
-                    and board.row(i).count(-1) != 2:
-                loseFields.append([board.row(i).index(-1), i])
+            if len(rowSet) == 2 and self.sign not in rowSet and -1 in rowSet \
+                    and row.count(-1) == 1:
+                loseFields.append([row.index(-1), n])
             # For column
-            if len(colTup) == 2 and self.sign not in colTup and -1 in colTup \
-                    and board.column(i).count(-1) != 2:
-                loseFields.append([i, board.column(i).index(-1)])
+            if len(colSet) == 2 and self.sign not in colSet and -1 in colSet \
+                    and col.count(-1) == 1:
+                loseFields.append([n, col.index(-1)])
 
         # Do the same for the two diagonal lines
-        for i in range(2):
-            diaTup = set(board.diagonal(i))
+        for n in range(2):
+            dia = board.diagonal(n)
+            diaSet = set(dia)
 
             # Check if the ai's sign is twice in the row/column
-            # and one free field is available
-            if len(diaTup) == 2 and self.sign in diaTup and -1 in diaTup \
-                    and board.diagonal(i).count(-1) != 2:
-                col = board.diagonal(i).index(-1)
-                winFields.append([col - 2*i, col])
+            # and one free field is available = Win
+            if len(diaSet) == 2 and self.sign in diaSet and -1 in diaSet \
+                    and dia.count(-1) == 1:
+                col = dia.index(-1)
+                winFields.append([col, 2*n - 2*n*col + col])
 
             # Check if the opponents sign is twice in the row/column
-            # and one free field is available
-            if len(diaTup) == 2 and self.sign not in diaTup and -1 in diaTup \
-                    and board.diagonal(i).count(-1) != 2:
-                col = board.diagonal(i).index(-1)
-                loseFields.append([col - 2*i, col])
+            # and one free field is available = Loss
+            if len(diaSet) == 2 and self.sign not in diaSet and -1 in diaSet \
+                    and dia.count(-1) == 1:
+                col = dia.index(-1)
+                loseFields.append([col, 2*n - 2*n*col + col])
 
         # If any field can give a win, choose one at random
         if len(winFields) > 0:
@@ -243,6 +246,36 @@ class AI(Player):
         if len(loseFields) > 0:
             i = choice(loseFields)
             return i[0], i[1]
+
+        """ # Check if there are fields that can make a threat to the opponent
+        threatFields = []
+        # Check if there can be made a to tile thread
+        for n in range(3):
+            row = board.row(n)
+            rowSet = set(row)
+            col = board.column(n)
+            colSet = set(col)
+
+            # For row
+            if len(rowSet) == 2 and self.sign in rowSet and row.count(-1) == 2:
+                threatFields.append([row.index(-1), n])
+            # For column
+            if len(colSet) == 2 and self.sign in colSet and col.count(-1) == 2:
+                threatFields.append([n, col.index(-1)])
+
+        for n in range(2):
+            dia = board.diagonal(n)
+            diaSet = set(dia)
+
+            # Check if the ai's sign is twice in the row/column
+            # and one free field is available
+            if len(diaSet) == 2 and self.sign in diaSet and dia.count(-1) == 2:
+                col = dia.index(-1)
+                threatFields.append([col, 2*n - 2*n*col + col])
+
+        if len(threatFields) > 0:
+            i = choice(threatFields)
+            return i[0], i[1] """
 
         # If no win or lose fields are available, choose at random
         return self.chooseRandom(board)
@@ -255,11 +288,17 @@ def game():
         print('What do you want to do? Pick from the options below.\n'
               '1: Play against another player.\n'
               '2: Play against the computer.\n'
-              '3: Exit')
+              '3: Smart (starting) against stupid computer.\n'
+              '4: Stupid (starting) against Smart computer.\n'
+              '5: Smart against smart computer.\n'
+              '0: Exit')
         val = input('Choose an option: ')
         print()
 
-        if val == '1':
+        if val == '0':
+            print('Hope to see you again :)')
+            break
+        elif val == '1':
             player1 = Player('Player 1', 0)
             player2 = Player('Player 2', 1)
 
@@ -276,8 +315,20 @@ def game():
 
             players = [player1, player2]
         elif val == '3':
-            print('Hope to see you again :)')
-            break
+            player1 = AI('Smart AI', 0, '1')
+            player2 = AI('Stupid AI', 1, '0')
+
+            players = [player1, player2]
+        elif val == '4':
+            player1 = AI('Stupid AI 1', 0, '0')
+            player2 = AI('Smart AI 2', 1, '1')
+
+            players = [player1, player2]
+        elif val == '5':
+            player1 = AI('Smart AI 1', 0, '1')
+            player2 = AI('Smart AI 2', 1, '1')
+
+            players = [player1, player2]
         else:
             print('Not an option.')
             continue
@@ -297,7 +348,7 @@ def runGame(board, players):
     # Main game run
     while True:
         player = next(currentP)
-        print(f'{players[player].name} is having their turn.')
+        print(f'{players[player].name} ({board.signs[players[player].sign]}) is having their turn.')
         # Request the player to input which field to use
         while True:
             x, y = players[player].getInput(board)
