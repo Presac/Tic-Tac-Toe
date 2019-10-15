@@ -1,4 +1,5 @@
 from random import randint, choice
+# from collections import Counter
 
 
 # Board class containing the state of the board and commands pertaining to it
@@ -247,7 +248,7 @@ class AI(Player):
             i = choice(loseFields)
             return i[0], i[1]
 
-        """ # Check if there are fields that can make a threat to the opponent
+        # Check if there are fields that can make a threat to the opponent
         threatFields = []
         # Check if there can be made a to tile thread
         for n in range(3):
@@ -258,10 +259,14 @@ class AI(Player):
 
             # For row
             if len(rowSet) == 2 and self.sign in rowSet and row.count(-1) == 2:
-                threatFields.append([row.index(-1), n])
+                for i in range(3):
+                    if row[i] == -1:
+                        threatFields.append([i, n])
             # For column
             if len(colSet) == 2 and self.sign in colSet and col.count(-1) == 2:
-                threatFields.append([n, col.index(-1)])
+                for i in range(3):
+                    if col[i] == -1:
+                        threatFields.append([n, i])
 
         for n in range(2):
             dia = board.diagonal(n)
@@ -270,12 +275,16 @@ class AI(Player):
             # Check if the ai's sign is twice in the row/column
             # and one free field is available
             if len(diaSet) == 2 and self.sign in diaSet and dia.count(-1) == 2:
-                col = dia.index(-1)
-                threatFields.append([col, 2*n - 2*n*col + col])
+                for i in range(3):
+                    if dia[i] == -1:
+                        threatFields.append([i, 2*n - 2*n*i + i])
 
         if len(threatFields) > 0:
+            # TODO prioritise threatFields that occurs the most
+            # ttf = dict([(k, v) for k, v in enumerate(threatFields)])
+            # ctr = Counter(ttf.values())
             i = choice(threatFields)
-            return i[0], i[1] """
+            return i[0], i[1]
 
         # If no win or lose fields are available, choose at random
         return self.chooseRandom(board)
@@ -348,7 +357,8 @@ def runGame(board, players):
     # Main game run
     while True:
         player = next(currentP)
-        print(f'{players[player].name} ({board.signs[players[player].sign]}) is having their turn.')
+        print(f'{players[player].name} ({board.signs[players[player].sign]})'
+              'is having their turn.')
         # Request the player to input which field to use
         while True:
             x, y = players[player].getInput(board)
