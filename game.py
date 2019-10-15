@@ -1,3 +1,5 @@
+from random import randint
+
 
 class Board:
     # Either 1 or 2
@@ -23,25 +25,33 @@ class Board:
             fieldStr += '\n'
         print(fieldStr)
 
+    def freeFields(self):
+        free = []
+        for i, row in enumerate(self.fields):
+            for j, field in enumerate(row):
+                if field is -1:
+                    free.append([j, i])
+        return free
+
     # Function to write to a field
     def writeField(self, x, y, input):
         self.fields[y][x] = input
 
     # Check whether y is within the allowable range
-    def withinY(self, y):
+    def isWithinY(self, y):
         return 0 <= int(y) - 1 < len(self.fields)
 
     # Check whether x is within the allowable range
-    def withinX(self, x):
+    def isWithinX(self, x):
         return 0 <= int(x) - 1 < len(self.fields[0])
 
     # Check whether x is within the allowable range
-    def withinBoard(self, x, y):
+    def isWithinBoard(self, x, y):
         return (0 <= int(x) - 1 < len(self.fields[0])) and \
             (0 <= int(y) - 1 < len(self.fields))
 
     # Check whether the location of the input is already taken
-    def fieldFree(self, x, y):
+    def isFieldFree(self, x, y):
         return self.fields[y][x] is -1
 
     # Check whether the current field is a win
@@ -94,6 +104,10 @@ class Board:
         if (y == 1 and (x == 0 or x == 2)) or (x == 1 and (y == 0 or y == 2)):
             return vertical(x, sign) or horizontal(y, sign)
 
+    # Check whether the current board is in a draw state
+    def isDraw(self):
+        return len(self.freeFields()) is 0
+
 
 # Player class for saving name and which sign to use
 class Player():
@@ -101,9 +115,8 @@ class Player():
         self.name = name
         self.sign = sign
 
-    # Asks for and returns a value from an input within the requirements of a
-    # function func
-    def getInput(self, func):
+    # Asks for and returns a 2 part value from an input
+    def getInput(self, board):
         while True:
             print('Choose row and coloumn (col row): ', end='')
             # Try for input, in case the user doesn't input two values
@@ -118,8 +131,8 @@ class Player():
                 print('Input is not a number. Letters won\'t work.')
                 continue
 
-            # Check if the values confine within the restrictions of a func
-            if func(x, y):
+            # Check if the values confine to the board
+            if board.isWithinBoard(x, y):
                 break
 
             print('The choice is not within the range of the board.')
@@ -127,8 +140,14 @@ class Player():
         return int(x) - 1, int(y) - 1
 
 
+# AI inherits from player
 class AI(Player):
-    pass
+    # Returns a random field from within the free ones
+    def getInput(self, board):
+        free = board.freeFields()
+        choice = randint(0, len(free) - 1)
+
+        return free[choice][0], free[choice][1]
 
 
 def game():
@@ -157,6 +176,7 @@ def game():
             print('Not an option.')
 
         while True:
+            board.resetBoard()
             runGame(board, players)
             break
 
@@ -172,10 +192,10 @@ def runGame(board, players):
         print(f'{players[player].name} is having their turn.')
         # Request the player to input which field to use
         while True:
-            x, y = players[player].getInput(board.withinBoard)
+            x, y = players[player].getInput(board)
 
             # Check if field is already free
-            if board.fieldFree(x, y):
+            if board.isFieldFree(x, y):
                 board.writeField(x, y, players[player].sign)
                 break
             else:
@@ -187,6 +207,12 @@ def runGame(board, players):
         # Check if the player has won
         if board.isWin(x, y, players[player].sign):
             print(f'{players[player].name} has won the game.')
+            # Stop current game
+            break
+
+        # Check if no more fields are free
+        if board.isDraw():
+            print('The game has ended in a draw.')
             # Stop current game
             break
 
