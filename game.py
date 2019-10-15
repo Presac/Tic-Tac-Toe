@@ -1,6 +1,7 @@
 from random import randint, choice
 
 
+# Board class containing the state of the board and commands pertaining to it
 class Board:
     # Either 1 or 2
     signs = ('X', 'O')
@@ -13,7 +14,7 @@ class Board:
     def resetBoard(self):
         self.fields = [[-1 for x in range(3)] for y in range(3)]
 
-    # Prints the table with 3 fields in each line
+    # Prints the board with 3 fields in each line
     def printBoard(self):
         fieldStr = ''
         for y in range(len(self.fields)):
@@ -22,6 +23,15 @@ class Board:
                     fieldStr += '[   ]'
                 else:
                     fieldStr += f'[ {self.signs[self.fields[y][x]]} ]'
+            fieldStr += '\n'
+        print(fieldStr)
+
+    # Prints an example board with the index of each field
+    def printExampleBoard(self):
+        fieldStr = ''
+        for y in range(len(self.fields)):
+            for x in range(len(self.fields[y])):
+                fieldStr += f'[{x+1} {y+1}]'
             fieldStr += '\n'
         print(fieldStr)
 
@@ -242,11 +252,13 @@ def game():
     board = Board()
     print('Welcome to a game of Tic-Tac-Toe')
     while True:
-        print('What do you want to do?\n'
+        print('What do you want to do? Pick from the options below.\n'
               '1: Play against another player.\n'
               '2: Play against the computer.\n'
               '3: Exit')
-        val = input('Pick a number: ')
+        val = input('Choose an option: ')
+        print()
+
         if val == '1':
             player1 = Player('Player 1', 0)
             player2 = Player('Player 2', 1)
@@ -257,6 +269,8 @@ def game():
                   '0: Very easy.\n'
                   '1: Very hard.')
             difficulty = input('(default: 0): ')
+            print()
+
             player1 = Player('Player 1', 0)
             player2 = AI('AI', 1, difficulty)
 
@@ -275,7 +289,8 @@ def game():
 
 
 def runGame(board, players):
-    board.printBoard()
+    print('The following board shows each fields index number.')
+    board.printExampleBoard()
 
     currentP = toggleValue()
 
@@ -299,13 +314,13 @@ def runGame(board, players):
 
         # Check if the player has won
         if board.isWin(x, y, players[player].sign):
-            print(f'{players[player].name} has won the game.')
+            print(f'{players[player].name} has won the game.\n')
             # Stop current game
             break
 
         # Check if no more fields are free
         if board.isDraw():
-            print('The game has ended in a draw.')
+            print('The game has ended in a draw.\n')
             # Stop current game
             break
 
