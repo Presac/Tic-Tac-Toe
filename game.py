@@ -63,7 +63,7 @@ class AI(Player):
         loseFields = []
 
         # Check if the ai can put its third sign in a line
-        for n in range(3):
+        for n in range(0, 9, 4):
             # Get the row/column and save it as set to remove dupes
             row = board.row(n)
             rowSet = set(row)
@@ -124,7 +124,7 @@ class AI(Player):
         # Check if there are fields that can make a threat to the opponent
         threatFields = []
         # Check if there can be made a to tile thread
-        for n in range(3):
+        for n in range(0, 9, 4):
             row = board.row(n)
             rowSet = set(row)
             col = board.column(n)
