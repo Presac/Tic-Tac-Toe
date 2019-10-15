@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, choice
 
 
 class Board:
@@ -25,6 +25,7 @@ class Board:
             fieldStr += '\n'
         print(fieldStr)
 
+    # Returns a list of all free fields
     def freeFields(self):
         free = []
         for i, row in enumerate(self.fields):
@@ -32,6 +33,20 @@ class Board:
                 if field is -1:
                     free.append([j, i])
         return free
+
+    # Returns n'th row
+    def row(self, n):
+        return self.fields[n]
+
+    # Returns n'th column
+    def column(self, n):
+        return [self.fields[i][n] for i in range(3)]
+
+    # Returns one of the two diagonals
+    # n=0 is a downward diagonal, n=1 an upward diagonal
+    def diagonal(self, n):
+        # The formula ensures the direction of the slope
+        return [self.fields[2*n - 2*n*i + i][i] for i in range(3)]
 
     # Function to write to a field
     def writeField(self, x, y, input):
@@ -101,7 +116,7 @@ class Board:
 
     # Check whether the current board is in a draw state
     def isDraw(self):
-        return len(self.freeFields()) is 0
+        return len(self.freeFields()) == 0
 
 
 # Player class for saving name and which sign to use
@@ -137,12 +152,90 @@ class Player():
 
 # AI inherits from player
 class AI(Player):
-    # Returns a random field from within the free ones
-    def getInput(self, board):
-        free = board.freeFields()
-        choice = randint(0, len(free) - 1)
+    def __init__(self, name, sign, difficulty):
+        super().__init__(name, sign)
+        # Will be used when different difficulties are made
+        self.difficulty = difficulty
 
-        return free[choice][0], free[choice][1]
+    # Get input depending on difficulty
+    def getInput(self, board):
+        if self.difficulty != '0':
+            return self.chooseSmart(board)
+        else:
+            return self.chooseRandom(board)
+
+    # Choose a random free field
+    def chooseRandom(self, board):
+        free = board.freeFields()
+        i = randint(0, len(free) - 1)
+
+        return free[i][0], free[i][1]
+
+    # Choose a free field depending on what is already taken
+    def chooseSmart(self, board):
+        # Stores fields which will make the AI win if taken
+        winFields = []
+        # Stores fields which will make the AI lose if not taken
+        loseFields = []
+
+        # Check if the ai can put its third sign in a line
+        for i in range(3):
+            # Get the row/column and save it as set to remove dupes
+            rowTup = set(board.row(i))
+            colTup = set(board.column(i))
+
+            # Check if the ai's sign is twice in the row/column
+            # and one free field is available
+            # For row
+            if len(rowTup) == 2 and self.sign in rowTup and -1 in rowTup \
+                    and board.row(i).count(self.sign) == 2:
+                winFields.append([board.row(i).index(-1), i])
+            # For column
+            if len(colTup) == 2 and self.sign in colTup and -1 in colTup \
+                    and board.column(i).count(self.sign) == 2:
+                winFields.append([i, board.column(i).index(-1)])
+
+            # Check if the opponents sign is twice in the row/column
+            # and one free field is available
+            # For row
+            if len(rowTup) == 2 and self.sign not in rowTup and -1 in rowTup \
+                    and board.row(i).count(-1) != 2:
+                loseFields.append([board.row(i).index(-1), i])
+            # For column
+            if len(colTup) == 2 and self.sign not in colTup and -1 in colTup \
+                    and board.column(i).count(-1) != 2:
+                loseFields.append([i, board.column(i).index(-1)])
+
+        # Do the same for the two diagonal lines
+        for i in range(2):
+            diaTup = set(board.diagonal(i))
+
+            # Check if the ai's sign is twice in the row/column
+            # and one free field is available
+            if len(diaTup) == 2 and self.sign in diaTup and -1 in diaTup \
+                    and board.diagonal(i).count(-1) != 2:
+                col = board.diagonal(i).index(-1)
+                winFields.append([col - 2*i, col])
+
+            # Check if the opponents sign is twice in the row/column
+            # and one free field is available
+            if len(diaTup) == 2 and self.sign not in diaTup and -1 in diaTup \
+                    and board.diagonal(i).count(-1) != 2:
+                col = board.diagonal(i).index(-1)
+                loseFields.append([col - 2*i, col])
+
+        # If any field can give a win, choose one at random
+        if len(winFields) > 0:
+            i = choice(winFields)
+            return i[0], i[1]
+
+        # If any field is about to make it lose, choose one at random
+        if len(loseFields) > 0:
+            i = choice(loseFields)
+            return i[0], i[1]
+
+        # If no win or lose fields are available, choose at random
+        return self.chooseRandom(board)
 
 
 def game():
@@ -160,8 +253,12 @@ def game():
 
             players = [player1, player2]
         elif val == '2':
+            print('Which difficulty do you want to play against?\n'
+                  '0: Very easy.\n'
+                  '1: Very hard.')
+            difficulty = input('(default: 0): ')
             player1 = Player('Player 1', 0)
-            player2 = AI('AI', 1)
+            player2 = AI('AI', 1, difficulty)
 
             players = [player1, player2]
         elif val == '3':
