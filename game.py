@@ -101,6 +101,31 @@ class Player():
         self.name = name
         self.sign = sign
 
+    # Asks for and returns a value from an input within the requirements of a
+    # function func
+    def getInput(self, func):
+        while True:
+            print('Choose row and coloumn (col row): ', end='')
+            # Try for input, in case the user doesn't input two values
+            try:
+                x, y = input().split(' ')
+            except ValueError:
+                print('Input is not 2 values.')
+                continue
+
+            # Check if any of the two values is not an int
+            if not (x.isdigit() and y.isdigit()):
+                print('Input is not a number. Letters won\'t work.')
+                continue
+
+            # Check if the values confine within the restrictions of a func
+            if func(x, y):
+                break
+
+            print('The choice is not within the range of the board.')
+
+        return int(x) - 1, int(y) - 1
+
 
 class AI(Player):
     pass
@@ -132,7 +157,7 @@ def game():
             print('Not an option.')
 
         while True:
-            runGame(board)
+            runGame(board, players)
             break
 
 
@@ -147,7 +172,7 @@ def runGame(board, players):
         print(f'{players[player].name} is having their turn.')
         # Request the player to input which field to use
         while True:
-            x, y = getInput(board.withinBoard)
+            x, y = players[player].getInput(board.withinBoard)
 
             # Check if field is already free
             if board.fieldFree(x, y):
@@ -164,32 +189,6 @@ def runGame(board, players):
             print(f'{players[player].name} has won the game.')
             # Stop current game
             break
-
-
-# Asks for and returns a value from an input within the requirements of a
-# function func
-def getInput(func):
-    while True:
-        print('Choose row and coloumn (col row): ', end='')
-        # Try for input, in case the user doesn't input two values
-        try:
-            x, y = input().split(' ')
-        except ValueError:
-            print('Input is not 2 values.')
-            continue
-
-        # Check if any of the two values is not an int
-        if not (x.isdigit() and y.isdigit()):
-            print('Input is not a number. Letters won\'t work.')
-            continue
-
-        # Check if the values confine within the restrictions of a func
-        if func(x, y):
-            break
-
-        print('The choice is not within the range of the board.')
-
-    return int(x) - 1, int(y) - 1
 
 
 # Iterator for going between 0 and 1
