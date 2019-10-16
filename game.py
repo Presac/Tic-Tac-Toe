@@ -31,7 +31,7 @@ class Player():
 
             print('The choice is not within the range of the board.')
 
-        return int(x) - 1, int(y) - 1
+        return board.twoDToOneD(int(x) - 1, int(y) - 1)
 
 
 # AI inherits from player
@@ -53,7 +53,7 @@ class AI(Player):
         free = board.freeFields()
         i = randint(0, len(free) - 1)
 
-        return free[i][0], free[i][1]
+        return free[i]
 
     # Choose a free field depending on what is already taken
     def chooseSmart(self, board):
@@ -61,8 +61,10 @@ class AI(Player):
         winFields = []
         # Stores fields which will make the AI lose if not taken
         loseFields = []
+        # Stores fields which can make a threat to the opponent
+        threatFields = []
 
-        # Check if the ai can put its third sign in a line
+        # Go through each row/column
         for n in range(0, 9, 4):
             # Get the row/column and save it as set to remove dupes
             row = board.row(n)
@@ -75,22 +77,34 @@ class AI(Player):
             # For row
             if len(rowSet) == 2 and self.sign in rowSet and -1 in rowSet \
                     and row.count(self.sign) == 2:
-                winFields.append([row.index(-1), n])
+                winFields.append(board.twoDToOneD(row.index(-1), n % 3))
             # For column
             if len(colSet) == 2 and self.sign in colSet and -1 in colSet \
                     and col.count(self.sign) == 2:
-                winFields.append([n, col.index(-1)])
+                winFields.append(board.twoDToOneD(n % 3, col.index(-1)))
 
             # Check if the opponents sign is twice in the row/column
             # and one free field is available = Loss
             # For row
             if len(rowSet) == 2 and self.sign not in rowSet and -1 in rowSet \
                     and row.count(-1) == 1:
-                loseFields.append([row.index(-1), n])
+                loseFields.append(board.twoDToOneD(row.index(-1), n % 3))
             # For column
             if len(colSet) == 2 and self.sign not in colSet and -1 in colSet \
                     and col.count(-1) == 1:
-                loseFields.append([n, col.index(-1)])
+                loseFields.append(board.twoDToOneD(n % 3, col.index(-1)))
+
+            # Check if there are fields that can make a threat to the opponent
+            # For row
+            if len(rowSet) == 2 and self.sign in rowSet and row.count(-1) == 2:
+                for i in range(3):
+                    if row[i] == -1:
+                        threatFields.append(board.twoDToOneD(i, n % 3))
+            # For column
+            if len(colSet) == 2 and self.sign in colSet and col.count(-1) == 2:
+                for i in range(3):
+                    if col[i] == -1:
+                        threatFields.append(board.twoDToOneD(n % 3, i))
 
         # Do the same for the two diagonal lines
         for n in range(2):
@@ -102,64 +116,42 @@ class AI(Player):
             if len(diaSet) == 2 and self.sign in diaSet and -1 in diaSet \
                     and dia.count(-1) == 1:
                 col = dia.index(-1)
-                winFields.append([col, 2*n - 2*n*col + col])
+                winFields.append(board.twoDToOneD(col, 2*n - 2*n*col + col))
 
             # Check if the opponents sign is twice in the row/column
             # and one free field is available = Loss
             if len(diaSet) == 2 and self.sign not in diaSet and -1 in diaSet \
                     and dia.count(-1) == 1:
                 col = dia.index(-1)
-                loseFields.append([col, 2*n - 2*n*col + col])
+                loseFields.append(board.twoDToOneD(col, 2*n - 2*n*col + col))
+
+            # Check if the ai's sign is in the row/column
+            # and two free fields is available
+            if len(diaSet) == 2 and self.sign in diaSet and dia.count(-1) == 2:
+                for i in range(3):
+                    if dia[i] == -1:
+                        threatFields.append(
+                            board.twoDToOneD(i, 2*n - 2*n*i + i))
 
         # If any field can give a win, choose one at random
         if len(winFields) > 0:
             i = choice(winFields)
-            return i[0], i[1]
+            return i
 
         # If any field is about to make it lose, choose one at random
         if len(loseFields) > 0:
             i = choice(loseFields)
-            return i[0], i[1]
-
-        # Check if there are fields that can make a threat to the opponent
-        threatFields = []
-        # Check if there can be made a to tile thread
-        for n in range(0, 9, 4):
-            row = board.row(n)
-            rowSet = set(row)
-            col = board.column(n)
-            colSet = set(col)
-
-            # For row
-            if len(rowSet) == 2 and self.sign in rowSet and row.count(-1) == 2:
-                for i in range(3):
-                    if row[i] == -1:
-                        threatFields.append([i, n])
-            # For column
-            if len(colSet) == 2 and self.sign in colSet and col.count(-1) == 2:
-                for i in range(3):
-                    if col[i] == -1:
-                        threatFields.append([n, i])
-
-        for n in range(2):
-            dia = board.diagonal(n)
-            diaSet = set(dia)
-
-            # Check if the ai's sign is twice in the row/column
-            # and one free field is available
-            if len(diaSet) == 2 and self.sign in diaSet and dia.count(-1) == 2:
-                for i in range(3):
-                    if dia[i] == -1:
-                        threatFields.append([i, 2*n - 2*n*i + i])
+            return i
 
         if len(threatFields) > 0:
             # TODO prioritise threatFields that occurs the most
             # ttf = dict([(k, v) for k, v in enumerate(threatFields)])
             # ctr = Counter(ttf.values())
             i = choice(threatFields)
-            return i[0], i[1]
+            return i
 
-        # If no win or lose fields are available, choose at random
+        # If no win or lose fields are available and no threats can be made,
+        # choose at random
         return self.chooseRandom(board)
 
 
@@ -234,11 +226,11 @@ def runGame(board, players):
               'is having their turn.')
         # Request the player to input which field to use
         while True:
-            x, y = players[player].getInput(board)
+            n = players[player].getInput(board)
 
             # Check if field is already free
-            if board.isFieldFree(x, y):
-                board.writeField(x, y, players[player].sign)
+            if board.isFieldFree(n):
+                board.writeField(players[player].sign, n)
                 break
             else:
                 print('The field is already taken.'
@@ -247,7 +239,7 @@ def runGame(board, players):
         board.printBoard()
 
         # Check if the player has won
-        if board.isWin(x, y, players[player].sign):
+        if board.isWin(players[player].sign, n):
             print(f'{players[player].name} has won the game.\n')
             # Stop current game
             break

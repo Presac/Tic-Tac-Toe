@@ -36,11 +36,14 @@ class Board:
         print(fieldStr)
 
     # Returns a list of all free fields
-    def freeFields(self):
+    def freeFields(self, twoD=False):
         free = []
         for i, field in enumerate(self.fields):
             if field is -1:
-                free.append(self.oneDToTwoD(i))
+                if twoD is False:
+                    free.append(i)
+                else:
+                    free.append(self.oneDToTwoD(i))
         return free
 
     # Returns n'th row
@@ -68,32 +71,25 @@ class Board:
         return n % 3, n // 3
 
     # Function to write to a field
-    def writeField(self, x, y, input):
-        self.fields[self.twoDToOneD(x, y)] = input
-
-    # region
-    """
-    # Check whether y is within the allowable range
-    def isWithinY(self, y):
-        return 0 <= int(y) - 1 < len(self.fields)
+    def writeField(self, input, x, y=None):
+        n = x if y is None else self.twoDToOneD(x, y)
+        self.fields[n] = input
 
     # Check whether x is within the allowable range
-    def isWithinX(self, x):
-        return 0 <= int(x) - 1 < len(self.fields[0])
-        """
-    # endregion
-
-    # Check whether x is within the allowable range
-    def isWithinBoard(self, x, y):
-        return (0 <= self.twoDToOneD(x, y) < len(self.fields))
+    def isWithinBoard(self, x, y=None):
+        if y is None:
+            return (0 <= x < len(self.fields))
+        else:
+            return 0 <= x < 3 and 0 <= y < 3
 
     # Check whether the location of the input is already taken
-    def isFieldFree(self, x, y):
-        return self.fields[self.twoDToOneD(x, y)] is -1
+    def isFieldFree(self, x, y=None):
+        n = x if y is None else self.twoDToOneD(x, y)
+        return self.fields[n] is -1
 
     # Check whether the current field is a win
-    def isWin(self, x, y, sign):
-        n = self.twoDToOneD(x, y)
+    def isWin(self, sign, x, y=None):
+        n = x if y is None else self.twoDToOneD(x, y)
 
         # Functions to check for sign in each form of line
 
@@ -145,4 +141,3 @@ if __name__ == "__main__":
     b.fields = [0, 1, 2, 3, 4, 5, 6, 7, 8]
     b.printExampleBoard(1)
     b.printExampleBoard()
-    print(b.diagonal(1))
