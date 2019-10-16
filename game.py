@@ -1,6 +1,6 @@
 from random import randint, choice
 from Board import Board
-# from collections import Counter
+from collections import Counter
 
 
 # Player class for saving name and which sign to use
@@ -75,18 +75,16 @@ class AI(Player):
             # Check if the ai's sign is twice in the row/column
             # and one free field is available = Win
             # For row
-            if len(rowSet) == 2 and self.sign in rowSet and -1 in rowSet \
-                    and row.count(self.sign) == 2:
+            if len(rowSet) == 2 and self.sign in rowSet and row.count(-1) == 1:
                 winFields.append(board.twoDToOneD(row.index(-1), n % 3))
             # For column
-            if len(colSet) == 2 and self.sign in colSet and -1 in colSet \
-                    and col.count(self.sign) == 2:
+            if len(colSet) == 2 and self.sign in colSet and col.count(-1) == 1:
                 winFields.append(board.twoDToOneD(n % 3, col.index(-1)))
 
             # Check if the opponents sign is twice in the row/column
             # and one free field is available = Loss
             # For row
-            if len(rowSet) == 2 and self.sign not in rowSet and -1 in rowSet \
+            if len(rowSet) == 2 and self.sign not in rowSet \
                     and row.count(-1) == 1:
                 loseFields.append(board.twoDToOneD(row.index(-1), n % 3))
             # For column
@@ -113,14 +111,13 @@ class AI(Player):
 
             # Check if the ai's sign is twice in the row/column
             # and one free field is available = Win
-            if len(diaSet) == 2 and self.sign in diaSet and -1 in diaSet \
-                    and dia.count(-1) == 1:
+            if len(diaSet) == 2 and self.sign in diaSet and dia.count(-1) == 1:
                 col = dia.index(-1)
                 winFields.append(board.twoDToOneD(col, 2*n - 2*n*col + col))
 
             # Check if the opponents sign is twice in the row/column
             # and one free field is available = Loss
-            if len(diaSet) == 2 and self.sign not in diaSet and -1 in diaSet \
+            if len(diaSet) == 2 and self.sign not in diaSet \
                     and dia.count(-1) == 1:
                 col = dia.index(-1)
                 loseFields.append(board.twoDToOneD(col, 2*n - 2*n*col + col))
@@ -144,10 +141,17 @@ class AI(Player):
             return i
 
         if len(threatFields) > 0:
-            # TODO prioritise threatFields that occurs the most
-            # ttf = dict([(k, v) for k, v in enumerate(threatFields)])
-            # ctr = Counter(ttf.values())
-            i = choice(threatFields)
+            # Prioritise threatFields that occurs the most
+            ctr = Counter(threatFields).most_common()
+            highest = []
+            most = -1
+            for k, v in ctr:
+                if v >= most:
+                    most = v
+                    highest.append(k)
+                else:
+                    break
+            i = choice(highest)
             return i
 
         # If no win or lose fields are available and no threats can be made,
