@@ -44,7 +44,7 @@ class AI(Player):
     # Get input depending on difficulty
     def getInput(self, board):
         if self.difficulty != '0':
-            return self.chooseSmart(board)
+            return self.smart2(board)
         else:
             return self.chooseRandom(board)
 
@@ -72,37 +72,35 @@ class AI(Player):
             col = board.column(n)
             colSet = set(col)
 
-            # Check if the ai's sign is twice in the row/column
-            # and one free field is available = Win
             # For row
-            if len(rowSet) == 2 and self.sign in rowSet and row.count(-1) == 1:
-                winFields.append(board.twoDToOneD(row.index(-1), n % 3))
+            if len(rowSet) == 2 and self.sign in row and row.count(-1) == 1:
+                winFields.append(Board.twoDToOneD(row.index(-1), n % 3))
             # For column
-            if len(colSet) == 2 and self.sign in colSet and col.count(-1) == 1:
-                winFields.append(board.twoDToOneD(n % 3, col.index(-1)))
+            if len(colSet) == 2 and self.sign in col and col.count(-1) == 1:
+                winFields.append(Board.twoDToOneD(n % 3, col.index(-1)))
 
             # Check if the opponents sign is twice in the row/column
             # and one free field is available = Loss
             # For row
             if len(rowSet) == 2 and self.sign not in rowSet \
                     and row.count(-1) == 1:
-                loseFields.append(board.twoDToOneD(row.index(-1), n % 3))
+                loseFields.append(Board.twoDToOneD(row.index(-1), n % 3))
             # For column
-            if len(colSet) == 2 and self.sign not in colSet and -1 in colSet \
+            if len(colSet) == 2 and self.sign not in col and -1 in colSet \
                     and col.count(-1) == 1:
-                loseFields.append(board.twoDToOneD(n % 3, col.index(-1)))
+                loseFields.append(Board.twoDToOneD(n % 3, col.index(-1)))
 
             # Check if there are fields that can make a threat to the opponent
             # For row
-            if len(rowSet) == 2 and self.sign in rowSet and row.count(-1) == 2:
+            if len(rowSet) == 2 and self.sign in row and row.count(-1) == 2:
                 for i in range(3):
                     if row[i] == -1:
-                        threatFields.append(board.twoDToOneD(i, n % 3))
+                        threatFields.append(Board.twoDToOneD(i, n % 3))
             # For column
-            if len(colSet) == 2 and self.sign in colSet and col.count(-1) == 2:
+            if len(colSet) == 2 and self.sign in col and col.count(-1) == 2:
                 for i in range(3):
                     if col[i] == -1:
-                        threatFields.append(board.twoDToOneD(n % 3, i))
+                        threatFields.append(Board.twoDToOneD(n % 3, i))
 
         # Do the same for the two diagonal lines
         for n in range(2):
@@ -111,24 +109,24 @@ class AI(Player):
 
             # Check if the ai's sign is twice in the row/column
             # and one free field is available = Win
-            if len(diaSet) == 2 and self.sign in diaSet and dia.count(-1) == 1:
+            if len(diaSet) == 2 and self.sign in dia and dia.count(-1) == 1:
                 col = dia.index(-1)
-                winFields.append(board.twoDToOneD(col, 2*n - 2*n*col + col))
+                winFields.append(Board.twoDToOneD(col, 2*n - 2*n*col + col))
 
             # Check if the opponents sign is twice in the row/column
             # and one free field is available = Loss
-            if len(diaSet) == 2 and self.sign not in diaSet \
-                    and dia.count(-1) == 1:
+            if len(diaSet) == 2 and self.sign not in dia and \
+                    dia.count(-1) == 1:
                 col = dia.index(-1)
-                loseFields.append(board.twoDToOneD(col, 2*n - 2*n*col + col))
+                loseFields.append(Board.twoDToOneD(col, 2*n - 2*n*col + col))
 
             # Check if the ai's sign is in the row/column
             # and two free fields is available
-            if len(diaSet) == 2 and self.sign in diaSet and dia.count(-1) == 2:
+            if len(diaSet) == 2 and self.sign in dia and dia.count(-1) == 2:
                 for i in range(3):
                     if dia[i] == -1:
                         threatFields.append(
-                            board.twoDToOneD(i, 2*n - 2*n*i + i))
+                            Board.twoDToOneD(i, 2*n - 2*n*i + i))
 
         # If any field can give a win, choose one at random
         if len(winFields) > 0:
@@ -157,6 +155,79 @@ class AI(Player):
         # If no win or lose fields are available and no threats can be made,
         # choose at random
         return self.chooseRandom(board)
+
+    def smart2(self, board):
+        free = board.freeFields()
+        states = []
+
+        # Check each free field for their state
+        for n in free:
+            # Get the diagonal lines
+            diagonal = [board.diagonal(0), board.diagonal(1)]
+
+            # Get the state of the fields row and column
+            # As every field has them, they will always be checked
+            state = self.merge_dicts(self.checkLine(board.row(n)),
+                                     self.checkLine(board.column(n)))
+
+            # Check if the field is in one of the diagonals
+            if n == 0 or n == 8:  # Upper left and lower right corner
+                state = self.merge_dicts(state, self.checkLine(diagonal[0]))
+            elif n == 2 or n == 6:  # Upper right and lower left corner
+                state = self.merge_dicts(state, self.checkLine(diagonal[1]))
+            if n == 4:  # Center
+                state = self.merge_dicts(state, self.checkLine(diagonal[0]))
+                state = self.merge_dicts(state, self.checkLine(diagonal[1]))
+
+            # Save the field number in state together with
+            # the state of the field
+            states.append({**{'n': n}, **state})
+
+        # Get a list with all the win/loss/threat fields
+        win = [state['n'] for state in states if state['win'] is True]
+        if len(win) > 0:
+            # No need to go further, as this will finish the game
+            return choice(win)
+
+        lose = [state['n'] for state in states if state['lose'] is True]
+        if len(lose) > 0:
+            # No need to go further. Not choosing the field will end the game
+            return choice(lose)
+
+        threats = {state['n']: state['threat']
+                   for state in states if state['threat'] != 0}
+        if len(threats) > 0:
+            # Sort by order of highest threat
+            ctr = Counter(threats).most_common()
+            # Get the fields with the highest threat
+            maxes = [k for k, v in ctr if v == ctr[0][1]]
+            return choice(maxes)
+        return self.chooseRandom(board)
+
+    def checkLine(self, line):
+        state = {'win': False, 'lose': False, 'threat': 0}
+        lineSet = set(line)
+        # full or empty
+        if len(lineSet) == 1:
+            pass  # None
+        if len(lineSet) == 2:
+            # Either a win or a possible loss
+            if line.count(-1) == 1:
+                state['win'] = self.sign in line
+                state['lose'] = self.sign not in line
+            # A threat can be made
+            if self.sign in line and line.count(-1) == 2:
+                state['threat'] = 1
+        return state
+
+    @staticmethod
+    def merge_dicts(x, y):
+        '''Returns a merge of two dictionaries. The values need to be either
+        Bool or numbers'''
+        z = {}
+        for k, v in x.items():
+            z[k] = v or y[k] if type(v) is bool else v + y[k]
+        return z
 
 
 def game():
