@@ -63,12 +63,14 @@ class Board:
         return self.fields[n*6:9 - n*8:4 - n*6]
 
     # Translates 2D index to 1D index
-    def twoDToOneD(self, x, y):
-        return x + y*3
+    @staticmethod
+    def twoDToOneD(x, y, width=3):
+        return x + y*width
 
     # Translates 1D index to 2D index
-    def oneDToTwoD(self, n):
-        return n % 3, n // 3
+    @staticmethod
+    def oneDToTwoD(n, width=3, heigth=3):
+        return n % width, n // heigth
 
     # Function to write to a field
     def writeField(self, input, x, y=None):
@@ -91,8 +93,6 @@ class Board:
     def isWin(self, sign, x, y=None):
         n = x if y is None else self.twoDToOneD(x, y)
 
-        # Functions to check for sign in each form of line
-
         # Checking in a horizontal line
         def horizontalWin(n, sign):
             # Check if all values are equal the played sign
@@ -112,24 +112,19 @@ class Board:
             test = self.diagonal(i)
             return all(f == sign for f in test)
 
-        # Check if input field is in a corner
-        # Corners are 0, 2, 6 and 8, thus the following check
-        if n % 2 == 0 and n != 4:
-            if n == 0 or n == 8:
-                temp = diagonalWin(sign, 0)
-            else:
-                temp = diagonalWin(sign, 1)
-            return verticalWin(n, sign) or horizontalWin(n, sign) or temp
+        # Every field can have a vertical/horizontal win, so just
+        # save the value
+        verHoriWin = verticalWin(n, sign) or horizontalWin(n, sign)
 
-        # Check if input field is in the center
-        if n == 4:
-            return verticalWin(n, sign) or horizontalWin(n, sign) or \
-                diagonalWin(sign, 0) or diagonalWin(sign, 1)
-
-        # Check if input field is at the edge
-        # Edges are 1, 3, 5, 7, thus the following
-        if n % 2 == 1:
-            return verticalWin(n, sign) or horizontalWin(n, sign)
+        # Check win condition.
+        if n == 0 or n == 8:  # Upper left and lower right corner
+            return verHoriWin or diagonalWin(sign, 0)
+        elif n == 2 or n == 6:  # Upper right and lower left corner
+            return verHoriWin or diagonalWin(sign, 1)
+        if n == 4:  # Center
+            return verHoriWin or diagonalWin(sign, 0) or diagonalWin(sign, 1)
+        else:  # Edges
+            return verHoriWin
 
     # Check whether the current board is in a draw state
     def isDraw(self):
@@ -140,4 +135,5 @@ if __name__ == "__main__":
     b = Board()
     b.fields = [0, 1, 2, 3, 4, 5, 6, 7, 8]
     b.printExampleBoard(1)
+    print()
     b.printExampleBoard()
