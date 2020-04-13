@@ -250,8 +250,6 @@ def game():
         elif val == '1':
             player1 = Player('Player 1', 0)
             player2 = Player('Player 2', 1)
-
-            players = [player1, player2]
         elif val == '2':
             print('Which difficulty do you want to play against?\n'
                   '0: Very easy.\n'
@@ -261,26 +259,20 @@ def game():
 
             player1 = Player('Player 1', 0)
             player2 = AI('AI', 1, difficulty)
-
-            players = [player1, player2]
         elif val == '3':
             player1 = AI('Smart AI', 0, '1')
             player2 = AI('Stupid AI', 1, '0')
-
-            players = [player1, player2]
         elif val == '4':
             player1 = AI('Stupid AI 1', 0, '0')
             player2 = AI('Smart AI 2', 1, '1')
-
-            players = [player1, player2]
         elif val == '5':
             player1 = AI('Smart AI 1', 0, '1')
             player2 = AI('Smart AI 2', 1, '1')
-
-            players = [player1, player2]
         else:
             print('Not an option.')
             continue
+
+        players = [player1, player2]
 
         while True:
             board.resetBoard()
