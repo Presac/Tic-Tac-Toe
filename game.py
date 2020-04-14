@@ -52,6 +52,11 @@ def chooseGamemode():
                 '0: Easy.\n'
                 '1: Hard.')
         difficulty = input('(default: 0): ')
+
+        if difficulty not in ['0', '1']:
+            difficulty = '0'
+            print('Defaultet to 0: Easy')
+        
         print()
 
         player1 = Player('Player 1', 0)
