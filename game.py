@@ -91,7 +91,7 @@ def runGame(board, players):
     # Main game run
     while True:
         player = next(currentP)
-        print(f'{players[player].name} ({board.signs[players[player].sign]})'
+        print(f'{players[player].name} ({board.signs[players[player].sign]}) '
               'is having their turn.')
         # Request the player to input which field to use
         while True:
