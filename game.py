@@ -1,5 +1,4 @@
 from Board import Board
-from collections import Counter
 from Players import Player, AI
 
 def game():

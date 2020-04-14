@@ -1,4 +1,6 @@
 from random import randint, choice
+from collections import Counter
+from Board import Board
 
 
 # Player class for saving name and which sign to use
