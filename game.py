@@ -5,51 +5,59 @@ def game():
     board = Board()
     print('Welcome to a game of Tic-Tac-Toe')
     while True:
-        print('What do you want to do? Pick from the options below.\n'
-              '1: Play against another player.\n'
-              '2: Play against the computer.\n'
-              '3: Smart (starting) against stupid computer.\n'
-              '4: Stupid (starting) against Smart computer.\n'
-              '5: Smart against smart computer.\n'
-              '0: Exit')
-        val = input('Choose an option: ')
-        print()
+        players = chooseGamemode()
 
-        if val == '0':
-            print('Hope to see you again :)')
-            break
-        elif val == '1':
-            player1 = Player('Player 1', 0)
-            player2 = Player('Player 2', 1)
-        elif val == '2':
-            print('Which difficulty do you want to play against?\n'
-                  '0: Very easy.\n'
-                  '1: Very hard.')
-            difficulty = input('(default: 0): ')
-            print()
-
-            player1 = Player('Player 1', 0)
-            player2 = AI('AI', 1, difficulty)
-        elif val == '3':
-            player1 = AI('Smart AI', 0, '1')
-            player2 = AI('Stupid AI', 1, '0')
-        elif val == '4':
-            player1 = AI('Stupid AI 1', 0, '0')
-            player2 = AI('Smart AI 2', 1, '1')
-        elif val == '5':
-            player1 = AI('Smart AI 1', 0, '1')
-            player2 = AI('Smart AI 2', 1, '1')
-        else:
-            print('Not an option.')
+        if players is None:
             continue
-
-        players = [player1, player2]
+        elif players is 'End':
+            break
 
         while True:
             board.resetBoard()
             runGame(board, players)
             break
 
+
+def chooseGamemode():
+    print('What do you want to do? Pick from the options below.\n'
+            '1: Play against another player.\n'
+            '2: Play against the computer.\n'
+            '3: Smart (starting) against stupid computer.\n'
+            '4: Stupid (starting) against Smart computer.\n'
+            '5: Smart against smart computer.\n'
+            '0: Exit')
+    val = input('Choose an option: ')
+    print()
+
+    if val == '0':
+        print('Hope to see you again :)')
+        return 'End'
+    elif val == '1':
+        player1 = Player('Player 1', 0)
+        player2 = Player('Player 2', 1)
+    elif val == '2':
+        print('Which difficulty do you want to play against?\n'
+                '0: Very easy.\n'
+                '1: Very hard.')
+        difficulty = input('(default: 0): ')
+        print()
+
+        player1 = Player('Player 1', 0)
+        player2 = AI('AI', 1, difficulty)
+    elif val == '3':
+        player1 = AI('Smart AI', 0, '1')
+        player2 = AI('Stupid AI', 1, '0')
+    elif val == '4':
+        player1 = AI('Stupid AI 1', 0, '0')
+        player2 = AI('Smart AI 2', 1, '1')
+    elif val == '5':
+        player1 = AI('Smart AI 1', 0, '1')
+        player2 = AI('Smart AI 2', 1, '1')
+    else:
+        print('Not an option.')
+        return None
+
+    return [player1, player2]
 
 def runGame(board, players):
     print('The following board shows each fields index number.')
