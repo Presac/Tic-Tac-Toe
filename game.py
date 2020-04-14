@@ -1,5 +1,9 @@
 from Board import Board
 from Players import Player, AI
+from gui import Application
+import tkinter as tk
+import argparse
+
 
 def game():
     """
@@ -117,4 +121,14 @@ def toggleValue():
         yield 1
 
 if __name__ == "__main__":
-    game()
+    parser = argparse.ArgumentParser(description='A tic-tac-toe game.')
+    parser.add_argument('-m', '--mode', nargs='?', default='gui')
+
+    args = parser.parse_args()
+    
+    if args.mode == 'cmd':
+        game()
+    else:
+        root = tk.Tk()
+        app = Application(master=root)
+        app.mainloop()
