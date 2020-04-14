@@ -80,7 +80,10 @@ class AI(Player):
         :returns: an int
         """
         free = board.freeFields()
-        i = randint(0, len(free) - 1)
+        if len(free) > 0:
+            i = randint(0, len(free) - 1)
+        else:
+            return None
 
         return free[i]
 

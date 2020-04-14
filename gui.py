@@ -114,9 +114,13 @@ class Application(tk.Frame):
         ended = self.handle_step(number)
 
         # Disable the ability to click on the board when the game is finished
+        # and stop the ai
         if ended:
             for field in self.label_list:
                 field.unbind('<Button-1>')
+            
+            self.after_cancel(self._loop)
+            self._loop = None
     
     def startGame(self):
         """
@@ -150,7 +154,8 @@ class Application(tk.Frame):
         self.current_player = next(self.player_iterator)
 
         self.createGameGrid(self.fr_gamegrid)
-        self.lbl_curr_player['text'] = f'Current player: {self.players[self.current_player].name}'
+        self.lbl_curr_player['text'] = f'Current player: {self.players[self.current_player].name} ' \
+            f'({self.board.signs[self.players[self.current_player].sign]})'
 
         self.game_loop()
 
@@ -192,7 +197,8 @@ class Application(tk.Frame):
             return True
 
         self.current_player = next(self.player_iterator)
-        self.lbl_curr_player['text'] = f'Current player: {self.players[self.current_player].name}'
+        self.lbl_curr_player['text'] = f'Current player: {self.players[self.current_player].name} ' \
+            f'({self.board.signs[self.players[self.current_player].sign]})'
 
         return False
 
