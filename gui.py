@@ -90,7 +90,7 @@ class Application(tk.Frame):
                     )
                 self.fr_grid.grid(row=i, column=j, padx=5, pady=5, sticky='nsew')
 
-                label = tk.Label(self.fr_grid, text=f" ", font=('-weight bold', 60))
+                label = tk.Label(self.fr_grid, text=f" ", font=('-weight bold', 78))
                 label.pack(fill=tk.BOTH, expand=True)
                 
                 # Bind a command to the label, corresponding to the number in the grid
