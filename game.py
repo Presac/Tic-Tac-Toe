@@ -2,6 +2,11 @@ from Board import Board
 from Players import Player, AI
 
 def game():
+    """
+    The top level game loop.
+    Gets the players and resets the game board at the start of each game then
+    starts the main game loop
+    """
     board = Board()
     print('Welcome to a game of Tic-Tac-Toe')
     while True:
@@ -12,13 +17,16 @@ def game():
         elif players is 'End':
             break
 
-        while True:
-            board.resetBoard()
-            runGame(board, players)
-            break
-
+        board.resetBoard()
+        runGame(board, players)
 
 def chooseGamemode():
+    """
+    Function to choose the game mode and difficulty.
+
+    :returns: A list of the two players, either ai or player.
+    """
+
     print('What do you want to do? Pick from the options below.\n'
             '1: Play against another player.\n'
             '2: Play against the computer.\n'
@@ -37,8 +45,8 @@ def chooseGamemode():
         player2 = Player('Player 2', 1)
     elif val == '2':
         print('Which difficulty do you want to play against?\n'
-                '0: Very easy.\n'
-                '1: Very hard.')
+                '0: Easy.\n'
+                '1: Hard.')
         difficulty = input('(default: 0): ')
         print()
 
@@ -60,6 +68,12 @@ def chooseGamemode():
     return [player1, player2]
 
 def runGame(board, players):
+    """
+    Handles the main game loop.
+
+    :param board: the board to play the game on
+    :param players: a list with two players, either ai or player.
+    """
     print('The following board shows each fields index number.')
     board.printExampleBoard()
 
@@ -96,13 +110,11 @@ def runGame(board, players):
             # Stop current game
             break
 
-
 # Iterator for going between 0 and 1
 def toggleValue():
     while True:
         yield 0
         yield 1
-
 
 if __name__ == "__main__":
     game()

@@ -6,12 +6,23 @@ from Board import Board
 # Player class for saving name and which sign to use
 class Player():
     def __init__(self, name, sign):
+        """
+        Initialize a human player
+
+        :param name: the name of the player
+        :param sign: the sign the player plays with
+        """
         self.name = name
         self.sign = sign
         self.type = 'human'
 
     # Asks for and returns a 2 part value from an input
     def getInput(self, board):
+        """
+        Get the input for a human player
+
+        :param board: the board to play on
+        """
         while True:
             print('Choose row and coloumn (col row): ', end='')
             # Try for input, in case the user doesn't input two values
@@ -38,6 +49,13 @@ class Player():
 # AI inherits from player
 class AI(Player):
     def __init__(self, name, sign, difficulty):
+        """
+        Initialize a ai player
+
+        :param name: the name of the player
+        :param sign: the sign the ai plays with
+        :param difficulty: the difficulty the ai should play at
+        """
         super().__init__(name, sign)
         # Will be used when different difficulties are made
         self.difficulty = int(difficulty)
@@ -45,6 +63,9 @@ class AI(Player):
 
     # Get input depending on difficulty
     def getInput(self, board):
+        """
+        Get an input depending on the difficulty
+        """
         if self.difficulty != 0:
             return self.smart2(board)
         else:
@@ -52,6 +73,12 @@ class AI(Player):
 
     # Choose a random free field
     def chooseRandom(self, board):
+        """
+        Choose a random value from a number of free fields from the board
+
+        :param board: the board to choose the free fields from
+        :returns: an int
+        """
         free = board.freeFields()
         i = randint(0, len(free) - 1)
 
@@ -59,6 +86,13 @@ class AI(Player):
 
     # Choose a free field depending on what is already taken
     def chooseSmart(self, board):
+        """
+        A "smart" ai to choose between the available fields depending on the
+        threat level of each field.
+
+        :param board: the board to choose a field from
+        :returns: an int
+        """
         # Stores fields which will make the AI win if taken
         winFields = []
         # Stores fields which will make the AI lose if not taken
@@ -159,6 +193,13 @@ class AI(Player):
         return self.chooseRandom(board)
 
     def smart2(self, board):
+        """
+        A "smart" ai to choose between the available fields depending on the
+        threat level of each field.
+
+        :param board: the board to choose a field from
+        :returns: an int
+        """
         free = board.freeFields()
         states = []
 
@@ -185,17 +226,19 @@ class AI(Player):
             # the state of the field
             states.append({**{'n': n}, **state})
 
-        # Get a list with all the win/loss/threat fields
+        # Get a list with all the win fields
         win = [state['n'] for state in states if state['win'] is True]
         if len(win) > 0:
             # No need to go further, as this will finish the game
             return choice(win)
 
+        # Get a list with all the loss fields
         lose = [state['n'] for state in states if state['lose'] is True]
         if len(lose) > 0:
             # No need to go further. Not choosing the field will end the game
             return choice(lose)
 
+        # Get a list with all the threat fields (towards the player)
         threats = {state['n']: state['threat']
                    for state in states if state['threat'] != 0}
         if len(threats) > 0:
@@ -207,6 +250,12 @@ class AI(Player):
         return self.chooseRandom(board)
 
     def checkLine(self, line):
+        """
+        Checks the state of list
+
+        :param line: a list
+        :returns: a list of the different states the line has
+        """
         state = {'win': False, 'lose': False, 'threat': 0}
         lineSet = set(line)
         # full or empty
@@ -224,8 +273,14 @@ class AI(Player):
 
     @staticmethod
     def merge_dicts(x, y):
-        '''Returns a merge of two dictionaries. The values need to be either
-        Bool or numbers'''
+        """
+        Returns a merge of two dictionaries. The values need to be either
+        Bool or numbers
+        
+        :param x: the first dictionary
+        :param y: the second dictionary
+        :returns: a dictionary
+        """
         z = {}
         for k, v in x.items():
             z[k] = v or y[k] if type(v) is bool else v + y[k]
