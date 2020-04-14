@@ -67,7 +67,7 @@ class AI(Player):
         Get an input depending on the difficulty
         """
         if self.difficulty != 0:
-            return self.smart2(board)
+            return self.smart(board)
         else:
             return self.chooseRandom(board)
 
@@ -88,114 +88,7 @@ class AI(Player):
         return free[i]
 
     # Choose a free field depending on what is already taken
-    def chooseSmart(self, board):
-        """
-        A "smart" ai to choose between the available fields depending on the
-        threat level of each field.
-
-        :param board: the board to choose a field from
-        :returns: an int
-        """
-        # Stores fields which will make the AI win if taken
-        winFields = []
-        # Stores fields which will make the AI lose if not taken
-        loseFields = []
-        # Stores fields which can make a threat to the opponent
-        threatFields = []
-
-        # Go through each row/column
-        for n in range(0, 9, 4):
-            # Get the row/column and save it as set to remove dupes
-            row = board.row(n)
-            rowSet = set(row)
-            col = board.column(n)
-            colSet = set(col)
-
-            # For row
-            if len(rowSet) == 2 and self.sign in row and row.count(-1) == 1:
-                winFields.append(Board.twoDToOneD(row.index(-1), n % 3))
-            # For column
-            if len(colSet) == 2 and self.sign in col and col.count(-1) == 1:
-                winFields.append(Board.twoDToOneD(n % 3, col.index(-1)))
-
-            # Check if the opponents sign is twice in the row/column
-            # and one free field is available = Loss
-            # For row
-            if len(rowSet) == 2 and self.sign not in rowSet \
-                    and row.count(-1) == 1:
-                loseFields.append(Board.twoDToOneD(row.index(-1), n % 3))
-            # For column
-            if len(colSet) == 2 and self.sign not in col and -1 in colSet \
-                    and col.count(-1) == 1:
-                loseFields.append(Board.twoDToOneD(n % 3, col.index(-1)))
-
-            # Check if there are fields that can make a threat to the opponent
-            # For row
-            if len(rowSet) == 2 and self.sign in row and row.count(-1) == 2:
-                for i in range(3):
-                    if row[i] == -1:
-                        threatFields.append(Board.twoDToOneD(i, n % 3))
-            # For column
-            if len(colSet) == 2 and self.sign in col and col.count(-1) == 2:
-                for i in range(3):
-                    if col[i] == -1:
-                        threatFields.append(Board.twoDToOneD(n % 3, i))
-
-        # Do the same for the two diagonal lines
-        for n in range(2):
-            dia = board.diagonal(n)
-            diaSet = set(dia)
-
-            # Check if the ai's sign is twice in the row/column
-            # and one free field is available = Win
-            if len(diaSet) == 2 and self.sign in dia and dia.count(-1) == 1:
-                col = dia.index(-1)
-                winFields.append(Board.twoDToOneD(col, 2*n - 2*n*col + col))
-
-            # Check if the opponents sign is twice in the row/column
-            # and one free field is available = Loss
-            if len(diaSet) == 2 and self.sign not in dia and \
-                    dia.count(-1) == 1:
-                col = dia.index(-1)
-                loseFields.append(Board.twoDToOneD(col, 2*n - 2*n*col + col))
-
-            # Check if the ai's sign is in the row/column
-            # and two free fields is available
-            if len(diaSet) == 2 and self.sign in dia and dia.count(-1) == 2:
-                for i in range(3):
-                    if dia[i] == -1:
-                        threatFields.append(
-                            Board.twoDToOneD(i, 2*n - 2*n*i + i))
-
-        # If any field can give a win, choose one at random
-        if len(winFields) > 0:
-            i = choice(winFields)
-            return i
-
-        # If any field is about to make it lose, choose one at random
-        if len(loseFields) > 0:
-            i = choice(loseFields)
-            return i
-
-        if len(threatFields) > 0:
-            # Prioritise threatFields that occurs the most
-            ctr = Counter(threatFields).most_common()
-            highest = []
-            most = -1
-            for k, v in ctr:
-                if v >= most:
-                    most = v
-                    highest.append(k)
-                else:
-                    break
-            i = choice(highest)
-            return i
-
-        # If no win or lose fields are available and no threats can be made,
-        # choose at random
-        return self.chooseRandom(board)
-
-    def smart2(self, board):
+    def smart(self, board):
         """
         A "smart" ai to choose between the available fields depending on the
         threat level of each field.
