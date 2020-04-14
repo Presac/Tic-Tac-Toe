@@ -8,6 +8,7 @@ class Player():
     def __init__(self, name, sign):
         self.name = name
         self.sign = sign
+        self.type = 'human'
 
     # Asks for and returns a 2 part value from an input
     def getInput(self, board):
@@ -39,11 +40,12 @@ class AI(Player):
     def __init__(self, name, sign, difficulty):
         super().__init__(name, sign)
         # Will be used when different difficulties are made
-        self.difficulty = difficulty
+        self.difficulty = int(difficulty)
+        self.type = 'ai'
 
     # Get input depending on difficulty
     def getInput(self, board):
-        if self.difficulty != '0':
+        if self.difficulty != 0:
             return self.smart2(board)
         else:
             return self.chooseRandom(board)
