@@ -86,10 +86,12 @@ class AI(Player):
         """
         Get an input depending on the difficulty
         """
-        if self.difficulty != 0:
+        if self.difficulty == 0:
+            return self.chooseRandom(board)
+        elif self.difficulty == 1:
             return self.smart(board)
         else:
-            return self.chooseRandom(board)
+            return self.chooseFuture(board)
 
     # Choose a random free field
     def chooseRandom(self, board):
@@ -187,6 +189,37 @@ class AI(Player):
             if self.sign in line and line.count(0) == 2:
                 state['threat'] = 1
         return state
+
+    def chooseFuture(self, board):
+
+        self.total = 0
+        def max_value(fields):
+            self.total += 1
+            if board.isTerminal(fields):
+                return board.utilityOf(fields, self.sign)
+            v = -infinity
+            for (a, s) in board.successorsOf(fields):
+                v = max(v, min_value(s))
+            return v
+
+        def min_value(fields):
+            self.total += 1
+            if board.isTerminal(fields):
+                return board.utilityOf(fields, self.sign)
+            v = infinity
+            for (a, s) in board.successorsOf(fields):
+                v = min(v, max_value(s))
+            return v
+
+        def argmax(iterable, func):
+            return max(iterable, key=func)
+
+        infinity = float('inf')
+        fields = board.fields[:]
+        action, fields = argmax(board.successorsOf(fields), lambda a: min_value(a[1]))
+        print(f'Total amount of runs: {self.total}')
+        return action
+
 
     @staticmethod
     def merge_dicts(x, y):

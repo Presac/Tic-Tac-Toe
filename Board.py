@@ -134,6 +134,62 @@ class Board:
         return len(self.freeFields()) == 0
 
 
+    # A faster win chekcer
+    def signWin(self, fields, sign):
+        if (fields[0] == sign and fields[1] == sign and fields[2] == sign) or \
+            (fields[3] == sign and fields[4] == sign and fields[5] == sign) or \
+            (fields[6] == sign and fields[7] == sign and fields[8] == sign) or \
+            (fields[0] == sign and fields[3] == sign and fields[6] == sign) or \
+            (fields[1] == sign and fields[4] == sign and fields[7] == sign) or \
+            (fields[2] == sign and fields[5] == sign and fields[8] == sign) or \
+            (fields[0] == sign and fields[4] == sign and fields[8] == sign) or \
+            (fields[6] == sign and fields[4] == sign and fields[2] == sign):
+            return True
+        else:
+            return False
+
+    def isTerminal(self, fields):
+        """
+        returns True if the state is either a win or a tie (board full)
+        :param fields: State of the checkerboard. Ex: [0, 0, 0, 0, 1, 0, 0, 0, 0]
+        :return:
+        """
+        if self.signWin(fields, 1) or self.signWin(fields, -1):
+            return True
+        
+        return False if 0 in fields else True
+
+    def utilityOf(self, fields, sign):
+        """
+        returns +1 if winner is the player with [sign], -1 if the [sign] lost, or 0 otherwise
+        :param fields: fields of the checkerboard. Ex: [0, 0, 0, 0, 1, 0, 0, 0, 0]
+        :return:
+        """    
+        if self.signWin(fields, 1):
+            return +1 if sign == 1 else -1
+
+        elif self.signWin(fields, -1):
+            return -1 if sign == 1 else +1
+
+        else:
+            return 0
+    
+    def successorsOf(self, fields):
+        """
+        returns a list of tuples (move, self, fields) as shown in the exercise slides
+        :param fields: State of the checkerboard. Ex: [0, 0, 0, 0, 1, 0, 0, 0, 0]
+        :return:
+        """
+        states = []
+        for i in range(9):
+            if fields[i] == 0:
+                temp = fields[:]
+                temp[i] = -1 if temp.count(-1) == temp.count(1) else 1
+                states.append((i, temp))
+        return states
+
+
+
 if __name__ == "__main__":
     b = Board()
     b.fields = [0, 1, 2, 3, 4, 5, 6, 7, 8]

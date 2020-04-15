@@ -50,10 +50,11 @@ def chooseGamemode():
     elif val == '2':
         print('Which difficulty do you want to play against?\n'
                 '0: Easy.\n'
-                '1: Hard.')
+                '1: Hard.\n'
+                '2: Impossible')
         difficulty = input('(default: 0): ')
 
-        if difficulty not in ['0', '1']:
+        if difficulty not in ['0', '1', '2']:
             difficulty = '0'
             print('Defaultet to 0: Easy')
         

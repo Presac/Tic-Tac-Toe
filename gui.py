@@ -10,17 +10,19 @@ class Application(tk.Frame):
 
         # A list of the different game modes
         self.OPTIONS = {
-            'Player VS Player': 1, 
-            'Player VS AI': 2, 
-            'Smart VS Stupid': 3, 
-            'Stupid VS Smart': 4, 
-            'Smart VS Smart': 5
+            'Player VS Player': 1,
+            'Player VS AI': 2,
+            'Smart VS Stupid': 3,
+            'Stupid VS Smart': 4,
+            'Smart VS Smart': 5,
+            'Ultra VS Ultra': 6
         }
 
         # A list of the different difficulties
         self.DIFFICULTY = {
             'Easy': 0,
-            'Hard': 1
+            'Hard': 1,
+            'Impossible': 2
         }
 
         self.label_list = []
@@ -142,9 +144,12 @@ class Application(tk.Frame):
         elif mode == 4:
             player1 = AI('Stupid AI 1', -1, 0)
             player2 = AI('Smart AI 2', 1, 1)
-        else:  # mode == '5':
-            player1 = AI('Smart AI 1', -1, 1)
+        elif mode == 5:
+            player1 = AI('Stupid AI 1', -1, 0)
             player2 = AI('Smart AI 2', 1, 1)
+        else:  # mode == '6':
+            player1 = AI('Ultra AI 1', -1, 2)
+            player2 = AI('Ultra AI 2', 1, 2)
 
         # Reset the board state
         self.board.resetBoard()
