@@ -153,11 +153,9 @@ class Board:
         returns True if the state is either a win or a tie (board full)
         :param fields: State of the checkerboard. Ex: [0, 0, 0, 0, 1, 0, 0, 0, 0]
         :return:
-        """
-        if self.signWin(fields, 1) or self.signWin(fields, -1):
-            return True
-        
-        return False if 0 in fields else True
+        """        
+        return True if self.signWin(fields, 1) or self.signWin(fields, -1) \
+            or 0 not in fields else False
 
     def utilityOf(self, fields, sign):
         """
