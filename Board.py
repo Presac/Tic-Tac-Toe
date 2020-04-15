@@ -5,11 +5,14 @@ class Board:
 
     def __init__(self):
         # Represents 9 fields
-        self.fields = [-1 for x in range(9)]
+        self.fields = [0 for x in range(9)]
 
     # Reset the board to the inital state
     def resetBoard(self):
-        self.fields = [-1 for x in range(9)]
+        self.fields = [0 for x in range(9)]
+
+    def getCharacter(self, val):
+        return self.signs[0] if val == -1 else self.signs[1]
 
     # Prints the board with 3 fields in each line
     def printBoard(self):
@@ -17,10 +20,10 @@ class Board:
         for i in range(len(self.fields)):
             if i % 3 == 0 and i != 0:
                 fieldStr += '\n'
-            if self.fields[i] is -1:
-                fieldStr += '[   ]'
+            if self.fields[i] is 0:
+                fieldStr += f'[ {i+1} ]'
             else:
-                fieldStr += f'[ {self.signs[self.fields[i]]} ]'
+                fieldStr += f'[ {self.getCharacter(self.fields[i])} ]'
         print(fieldStr)
 
     # Prints an example board with the index of each field
@@ -32,14 +35,14 @@ class Board:
             if val is None:
                 fieldStr += f'[{i % 3 + 1} {i // 3 + 1}]'
             else:
-                fieldStr += f'[ {i} ]'
+                fieldStr += f'[ {i+1} ]'
         print(fieldStr)
 
     # Returns a list of all free fields
     def freeFields(self, twoD=False):
         free = []
         for i, field in enumerate(self.fields):
-            if field is -1:
+            if field is 0:
                 if twoD is False:
                     free.append(i)
                 else:
@@ -87,7 +90,7 @@ class Board:
     # Check whether the location of the input is already taken
     def isFieldFree(self, x, y=None):
         n = x if y is None else self.twoDToOneD(x, y)
-        return self.fields[n] is -1
+        return self.fields[n] is 0
 
     # Check whether the current field is a win
     def isWin(self, sign, x, y=None):
@@ -96,21 +99,21 @@ class Board:
         # Checking in a horizontal line
         def horizontalWin(n, sign):
             # Check if all values are equal the played sign
-            test = self.row(n)
-            return all(f == sign for f in test)
+            n_row = self.row(n)
+            return all(f == sign for f in n_row)
 
         # Checking in a vertical line.
         def verticalWin(n, sign):
             # Check if all values are equal the played sign
-            test = self.column(n)
-            return all(f == sign for f in test)
+            n_column = self.column(n)
+            return all(f == sign for f in n_column)
 
         # Checking in a downward diagonal line.
         # i=0 is downward, i=1 is upward
         def diagonalWin(sign, i):
             # Check if all values are equal the played sign
-            test = self.diagonal(i)
-            return all(f == sign for f in test)
+            i_diag = self.diagonal(i)
+            return all(f == sign for f in i_diag)
 
         # Every field can have a vertical/horizontal win, so just
         # save the value

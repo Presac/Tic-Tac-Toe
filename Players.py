@@ -23,27 +23,47 @@ class Player():
 
         :param board: the board to play on
         """
+        # while True:
+        #     print('Choose row and coloumn (col row): ', end='')
+        #     # Try for input, in case the user doesn't input two values
+        #     try:
+        #         x, y = input().split(' ')
+        #     except ValueError:
+        #         print('Input is not 2 values.')
+        #         continue
+
+        #     # Check if any of the two values is not an int
+        #     if not (x.isdigit() and y.isdigit()):
+        #         print('Input is not a number. Letters won\'t work.')
+        #         continue
+
+        #     # Check if the values confine to the board
+        #     if board.isWithinBoard(int(x) - 1, int(y) - 1):
+        #         break
+
+        #     print('The choice is not within the range of the board.')
+
+        # return board.twoDToOneD(int(x) - 1, int(y) - 1)
+
         while True:
-            print('Choose row and coloumn (col row): ', end='')
-            # Try for input, in case the user doesn't input two values
-            try:
-                x, y = input().split(' ')
-            except ValueError:
-                print('Input is not 2 values.')
-                continue
+            print('Choose a field: ', end='')
+            x = input()
 
             # Check if any of the two values is not an int
-            if not (x.isdigit() and y.isdigit()):
+            if not x.isdigit():
                 print('Input is not a number. Letters won\'t work.')
                 continue
 
             # Check if the values confine to the board
-            if board.isWithinBoard(int(x) - 1, int(y) - 1):
+            if board.isWithinBoard(int(x) - 1):
                 break
 
             print('The choice is not within the range of the board.')
 
-        return board.twoDToOneD(int(x) - 1, int(y) - 1)
+        return int(x) - 1
+
+    def getCharacter(self, board):
+        return board.getCharacter(self.sign)
 
 
 # AI inherits from player
@@ -158,12 +178,13 @@ class AI(Player):
         if len(lineSet) == 1:
             pass  # None
         if len(lineSet) == 2:
+            # Count the number of empty fields
             # Either a win or a possible loss
-            if line.count(-1) == 1:
+            if line.count(0) == 1:
                 state['win'] = self.sign in line
                 state['lose'] = self.sign not in line
             # A threat can be made
-            if self.sign in line and line.count(-1) == 2:
+            if self.sign in line and line.count(0) == 2:
                 state['threat'] = 1
         return state
 

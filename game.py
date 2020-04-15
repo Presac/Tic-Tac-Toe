@@ -45,7 +45,7 @@ def chooseGamemode():
         print('Hope to see you again :)')
         return 'End'
     elif val == '1':
-        player1 = Player('Player 1', 0)
+        player1 = Player('Player 1', -1)
         player2 = Player('Player 2', 1)
     elif val == '2':
         print('Which difficulty do you want to play against?\n'
@@ -59,16 +59,16 @@ def chooseGamemode():
         
         print()
 
-        player1 = Player('Player 1', 0)
+        player1 = Player('Player 1', -1)
         player2 = AI('AI', 1, difficulty)
     elif val == '3':
-        player1 = AI('Smart AI', 0, '1')
+        player1 = AI('Smart AI', -1, '1')
         player2 = AI('Stupid AI', 1, '0')
     elif val == '4':
-        player1 = AI('Stupid AI 1', 0, '0')
+        player1 = AI('Stupid AI 1', -1, '0')
         player2 = AI('Smart AI 2', 1, '1')
     elif val == '5':
-        player1 = AI('Smart AI 1', 0, '1')
+        player1 = AI('Smart AI 1', -1, '1')
         player2 = AI('Smart AI 2', 1, '1')
     else:
         print('Not an option.')
@@ -84,14 +84,14 @@ def runGame(board, players):
     :param players: a list with two players, either ai or player.
     """
     print('The following board shows each fields index number.')
-    board.printExampleBoard()
+    board.printExampleBoard(True)
 
     currentP = toggleValue()
 
     # Main game run
     while True:
         player = next(currentP)
-        print(f'\n{players[player].name} ({board.signs[players[player].sign]}) '
+        print(f'\n{players[player].name} ({players[player].getCharacter(board)}) '
               'is having their turn.')
         # Request the player to input which field to use
         while True:

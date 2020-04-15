@@ -131,19 +131,19 @@ class Application(tk.Frame):
         diff = self.DIFFICULTY[self.var_diff.get()]
 
         if mode == 1:
-            player1 = Player('Player 1', 0)
+            player1 = Player('Player 1', -1)
             player2 = Player('Player 2', 1)
         elif mode == 2:
-            player1 = Player('Player 1', 0)
+            player1 = Player('Player 1', -1)
             player2 = AI('AI', 1, diff)
         elif mode == 3:
-            player1 = AI('Smart AI', 0, 1)
+            player1 = AI('Smart AI', -1, 1)
             player2 = AI('Stupid AI', 1, 0)
         elif mode == 4:
-            player1 = AI('Stupid AI 1', 0, 0)
+            player1 = AI('Stupid AI 1', -1, 0)
             player2 = AI('Smart AI 2', 1, 1)
         else:  # mode == '5':
-            player1 = AI('Smart AI 1', 0, 1)
+            player1 = AI('Smart AI 1', -1, 1)
             player2 = AI('Smart AI 2', 1, 1)
 
         # Reset the board state
@@ -183,8 +183,7 @@ class Application(tk.Frame):
         :param number: the grid number to add the sign to
         """
         self.board.writeField(self.players[self.current_player].sign, number)
-        self.label_list[number]['text'] = self.board.signs[
-            self.players[self.current_player].sign]
+        self.label_list[number]['text'] = self.players[self.current_player].getCharacter(self.board)
 
         # Check if the game has ended
         if self.board.isWin(self.players[self.current_player].sign, number):
@@ -198,7 +197,7 @@ class Application(tk.Frame):
 
         self.current_player = next(self.player_iterator)
         self.lbl_curr_player['text'] = f'Current player: {self.players[self.current_player].name} ' \
-            f'({self.board.signs[self.players[self.current_player].sign]})'
+            f'({self.players[self.current_player].getCharacter(self.board)})'
 
         return False
 
