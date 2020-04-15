@@ -190,21 +190,28 @@ class AI(Player):
                 state['threat'] = 1
         return state
 
-    def chooseFuture(self, board):
-        def max_value(fields):
+    # a minimax type of chooser
+    def chooseFuture(self, board, depth=6):
+        # Depth will make it only look a certain amount of steps forward
+        # 6 seems to be the deepest it have to go to never loose
+        def max_value(fields, depth):
+            if depth == 0:
+                return 0
             if board.isTerminal(fields):
                 return board.utilityOf(fields, self.sign)
             v = -infinity
             for (a, s) in board.successorsOf(fields):
-                v = max(v, min_value(s))
+                v = max(v, min_value(s, depth - 1))
             return v
 
-        def min_value(fields):
+        def min_value(fields, depth):
+            if depth == 0:
+                return 0
             if board.isTerminal(fields):
                 return board.utilityOf(fields, self.sign)
             v = infinity
             for (a, s) in board.successorsOf(fields):
-                v = min(v, max_value(s))
+                v = min(v, max_value(s, depth - 1))
             return v
 
         def argmax(iterable, func):
@@ -212,7 +219,7 @@ class AI(Player):
 
         infinity = float('inf')
         fields = board.fields[:]
-        action, fields = argmax(board.successorsOf(fields), lambda a: min_value(a[1]))
+        action, fields = argmax(board.successorsOf(fields), lambda a: min_value(a[1], depth))
         return action
 
 
