@@ -191,10 +191,7 @@ class AI(Player):
         return state
 
     def chooseFuture(self, board):
-
-        self.total = 0
         def max_value(fields):
-            self.total += 1
             if board.isTerminal(fields):
                 return board.utilityOf(fields, self.sign)
             v = -infinity
@@ -203,7 +200,6 @@ class AI(Player):
             return v
 
         def min_value(fields):
-            self.total += 1
             if board.isTerminal(fields):
                 return board.utilityOf(fields, self.sign)
             v = infinity
@@ -217,7 +213,6 @@ class AI(Player):
         infinity = float('inf')
         fields = board.fields[:]
         action, fields = argmax(board.successorsOf(fields), lambda a: min_value(a[1]))
-        print(f'Total amount of runs: {self.total}')
         return action
 
 
